@@ -139,10 +139,17 @@ public:
             auxT = QString::number(auxChan3 / 16384.0, 'f', 4) + " G";
         } else if (fidicuial.auxFieldId == MfamAuxFieldId::aux)
         {
-            auxX = QString::number(auxChan0 * 503.975 / (4096 - 273.15), 'f', 4) + "C";
+            auxX = QString::number(((auxChan0 * 503.975) / 4096) - 273.15, 'f', 4) + "C";
+            // qDebug() << "FPGA Temp:" << auxX;
             auxY = QString::number((4096 - auxChan1 - 1720) / 8.2 - 35, 'f', 4) + "C";
+            // qDebug() << "Board/Osc Temp:" << auxY;
             auxZ = QString::number(auxChan2 * 34.1325 / 4096, 'f', 4) + "V";
-            auxT = QString::number(1 / auxChan3, 'f', 4) + "h";
+            // qDebug() << "Supply Voltage:" << auxZ;
+            double days = std::floor(static_cast<double>(auxChan3) / 24);
+            double hours = ((static_cast<double>(auxChan3) / 24) - days) * 24;
+            auxT = QString::number(days, 'f', 0) + " days " +
+                QString::number(hours, 'f', 0) + " hours";
+            // qDebug() << "Total Runtime:" << auxT;
         } else if (fidicuial.auxFieldId == MfamAuxFieldId::serialNumber)
         {
             if (auxChan3 >> 8 < 10)
@@ -159,14 +166,10 @@ public:
             {
                 auxX = auxX + QString::number(static_cast<uint8_t>(auxChan3 & 0xFF));
             }
+
             auxY = QChar(auxChan2 >> 8);
-            if ((auxChan2 & 0xFF) < 10)
-            {
-                auxY = auxY + "0" +  QString::number(static_cast<uint8_t>(auxChan2 & 0xFF));
-            } else
-            {
-                auxY = auxY + QString::number(static_cast<uint8_t>(auxChan2 & 0xFF));
-            }
+            auxY = auxY + QChar(auxChan2 & 0xFF);
+
             if (auxChan1 >> 8 < 10)
             {
                 auxZ = "0" + QString::number(static_cast<uint8_t>(auxChan1 >> 8));

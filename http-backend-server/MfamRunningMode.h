@@ -27,7 +27,7 @@ inline QString toString(const MfamRunningMode& runningMode)
     case MfamRunningMode::startup:
         return "Startup";
     case MfamRunningMode::hibernate:
-        break;
+        return "Hibernate";
     }
     return "Unknown";
 }
